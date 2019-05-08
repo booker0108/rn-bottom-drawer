@@ -110,6 +110,15 @@ export default class BottomDrawer extends Component {
     }
   };
 
+  closeDrawer = () => {
+    if (this.animator.current) {
+      this.animator.current._transitionTo(
+        this.downPosition,
+        this.props.onCollapsed
+      );
+    }
+  };
+
   render() {
     return (
       <Animator
