@@ -1,5 +1,5 @@
 declare module "rn-bottom-drawer" {
-  interface Props {
+  interface Props extends ViewProps {
     containerHeight: number;
     offset?: number;
     startUp?: boolean;
