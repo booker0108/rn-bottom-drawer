@@ -11,7 +11,7 @@ declare module "rn-bottom-drawer" {
     onCollapsed?: () => void;
   }
 
-  export default class BottomDrawer extends React.Component<> {
+  export default class BottomDrawer extends React.Component<Props> {
     openDrawer: () => void;
     closeDrawer: () => void;
   }
