@@ -104,7 +104,7 @@ export default class BottomDrawer extends Component {
   openDrawer = () => {
     if (this.animator.current) {
       this.animator.current._transitionTo(
-        this.upPosition,
+        this.UP_POSITION,
         this.props.onExpanded
       );
     }
@@ -113,7 +113,7 @@ export default class BottomDrawer extends Component {
   closeDrawer = () => {
     if (this.animator.current) {
       this.animator.current._transitionTo(
-        this.downPosition,
+        this.DOWN_POSITION,
         this.props.onCollapsed
       );
     }
