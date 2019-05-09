@@ -1,24 +1,21 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { 
-  View,
-  Dimensions,
-} from 'react-native';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { View, Dimensions } from "react-native";
 
-import Animator from './Animator';
+import Animator from "./Animator";
 
-const SCREEN_HEIGHT = Dimensions.get('window').height;
+const SCREEN_HEIGHT = Dimensions.get("window").height;
 
-export default class BottomDrawer extends Component{
+export default class BottomDrawer extends Component {
   static propTypes = {
     /**
-     * Height of the drawer. 
+     * Height of the drawer.
      */
     containerHeight: PropTypes.number.isRequired,
 
     /**
      * The amount of offset to apply to the drawer's position.
-     * If the app uses a header and tab navigation, offset should equal 
+     * If the app uses a header and tab navigation, offset should equal
      * the sum of those two components' heights.
      */
     offset: PropTypes.number,
@@ -29,7 +26,7 @@ export default class BottomDrawer extends Component{
     startUp: PropTypes.bool,
 
     /**
-     * How much the drawer's down display falls beneath the up display. 
+     * How much the drawer's down display falls beneath the up display.
      * Ex: if set to 20, the down display will be 20 points underneath the up display.
      */
     downDisplay: PropTypes.number,
@@ -58,19 +55,19 @@ export default class BottomDrawer extends Component{
      * A callback function triggered when the drawer swiped into down position
      */
     onCollapsed: PropTypes.func
-  }
+  };
 
   static defaultProps = {
     offset: 0,
     startUp: true,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     roundedEdges: true,
     shadow: true,
     onExpanded: () => {},
     onCollapsed: () => {}
-  }
+  };
 
-  constructor(props){
+  constructor(props) {
     super(props);
 
     /**
@@ -78,53 +75,91 @@ export default class BottomDrawer extends Component{
      * before its position changes between up / down.
      */
     this.TOGGLE_THRESHOLD = this.props.containerHeight / 11;
-    this.DOWN_DISPLAY = this.props.downDisplay || this.props.containerHeight / 1.5;
+    this.DOWN_DISPLAY =
+      this.props.downDisplay || this.props.containerHeight / 1.5;
 
     /**
      * UP_POSITION and DOWN_POSITION calculate the two (x,y) values for when
      * the drawer is swiped into up position and down position.
      */
-    this.UP_POSITION = this._calculateUpPosition(SCREEN_HEIGHT, this.props.containerHeight, this.props.offset)
-    this.DOWN_POSITION = this._calculateDownPosition(this.UP_POSITION, this.DOWN_DISPLAY)
+    this.UP_POSITION = this._calculateUpPosition(
+      SCREEN_HEIGHT,
+      this.props.containerHeight,
+      this.props.offset
+    );
+    this.DOWN_POSITION = this._calculateDownPosition(
+      this.UP_POSITION,
+      this.DOWN_DISPLAY
+    );
 
-    this.state = { currentPosition: this.props.startUp ? this.UP_POSITION : this.DOWN_POSITION };
+    this.state = {
+      currentPosition: this.props.startUp
+        ? this.UP_POSITION
+        : this.DOWN_POSITION
+    };
+
+    this.animator = React.createRef();
   }
 
-  render() {   
+  openDrawer = () => {
+    if (this.animator.current) {
+      this.animator.current._transitionTo(
+        this.UP_POSITION,
+        this.props.onExpanded
+      );
+    }
+  };
+
+  closeDrawer = () => {
+    if (this.animator.current) {
+      this.animator.current._transitionTo(
+        this.DOWN_POSITION,
+        this.props.onCollapsed
+      );
+    }
+  };
+
+  render() {
     return (
       <Animator
-        currentPosition = {this.state.currentPosition}
-        setCurrentPosition = {(position) => this.setCurrentPosition(position)}
-        toggleThreshold = {this.TOGGLE_THRESHOLD}
-        upPosition = {this.UP_POSITION}
-        downPosition = {this.DOWN_POSITION}
-        roundedEdges = {this.props.roundedEdges}
-        shadow = {this.props.shadow}
-        containerHeight = {this.props.containerHeight}
-        backgroundColor = {this.props.backgroundColor}
-        onExpanded = {() => this.props.onExpanded()}
-        onCollapsed = {() => this.props.onCollapsed()}
+        ref={this.animator}
+        currentPosition={this.state.currentPosition}
+        setCurrentPosition={position => this.setCurrentPosition(position)}
+        toggleThreshold={this.TOGGLE_THRESHOLD}
+        upPosition={this.UP_POSITION}
+        downPosition={this.DOWN_POSITION}
+        roundedEdges={this.props.roundedEdges}
+        shadow={this.props.shadow}
+        containerHeight={this.props.containerHeight}
+        backgroundColor={this.props.backgroundColor}
+        onExpanded={() => this.props.onExpanded()}
+        onCollapsed={() => this.props.onCollapsed()}
       >
         {this.props.children}
 
-        <View style={{height: Math.sqrt(SCREEN_HEIGHT), backgroundColor: this.props.backgroundColor}} />
+        <View
+          style={{
+            height: Math.sqrt(SCREEN_HEIGHT),
+            backgroundColor: this.props.backgroundColor
+          }}
+        />
       </Animator>
-    )
+    );
   }
 
   setCurrentPosition(position) {
-    this.setState({ currentPosition: position })
+    this.setState({ currentPosition: position });
   }
 
   _calculateUpPosition(screenHeight, containerHeight, offset) {
     return {
-      x: 0, 
-      y: screenHeight - (containerHeight + offset) 
-    }
+      x: 0,
+      y: screenHeight - (containerHeight + offset)
+    };
   }
 
   _calculateDownPosition(upPosition, downDisplay) {
-    return { 
+    return {
       x: 0,
       y: upPosition.y + downDisplay
     };
